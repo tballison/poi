@@ -18,13 +18,12 @@ package org.apache.poi.xssf.eventusermodel;
 
 import static org.apache.poi.xssf.usermodel.XSSFRelation.NS_SPREADSHEETML;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
@@ -108,6 +107,7 @@ public class ReadOnlySharedStringsTable extends DefaultHandler {
         // Some workbooks have no shared strings table.
         if (parts.size() > 0) {
             PackagePart sstPart = parts.get(0);
+
             readFrom(sstPart.getInputStream());
         }
     }
@@ -131,18 +131,26 @@ public class ReadOnlySharedStringsTable extends DefaultHandler {
     public void readFrom(InputStream is) throws IOException, SAXException {
         // test if the file is empty, otherwise parse it
         PushbackInputStream pis = new PushbackInputStream(is, 1);
-        int emptyTest = pis.read();
-        if (emptyTest > -1) {
-            pis.unread(emptyTest);
-            InputSource sheetSource = new InputSource(pis);
-            try {
-                XMLReader sheetParser = SAXHelper.newXMLReader();
-                sheetParser.setContentHandler(this);
-                sheetParser.parse(sheetSource);
-            } catch(ParserConfigurationException e) {
-                throw new RuntimeException("SAX parser appears to be broken - " + e.getMessage());
+        int firstByte = pis.read();
+        if (firstByte > -1) {
+            pis.unread(firstByte);
+            if (firstByte == 0x9f) {
+                readFromBinary(is);
+            } else {
+                InputSource sheetSource = new InputSource(pis);
+                try {
+                    XMLReader sheetParser = SAXHelper.newXMLReader();
+                    sheetParser.setContentHandler(this);
+                    sheetParser.parse(sheetSource);
+                } catch (ParserConfigurationException e) {
+                    throw new RuntimeException("SAX parser appears to be broken - " + e.getMessage());
+                }
             }
         }
+    }
+
+    private void readFromBinary(InputStream is) {
+
     }
 
     /**

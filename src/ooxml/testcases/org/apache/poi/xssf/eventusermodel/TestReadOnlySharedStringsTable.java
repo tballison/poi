@@ -19,8 +19,11 @@
 
 package org.apache.poi.xssf.eventusermodel;
 
-import junit.framework.TestCase;
+import java.io.IOException;
+import java.util.List;
+import java.util.regex.Pattern;
 
+import junit.framework.TestCase;
 import org.apache.poi.POIDataSamples;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
@@ -29,14 +32,13 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTRst;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.regex.Pattern;
-
 /**
  * Tests for {@link org.apache.poi.xssf.eventusermodel.XSSFReader}
  */
 public final class TestReadOnlySharedStringsTable extends TestCase {
+    static {
+        System.setProperty("POI.testdata.path", "C:/users/tallison/Idea Projects/poi-trunk/test-data");
+    }
     private static POIDataSamples _ssTests = POIDataSamples.getSpreadSheetInstance();
 
     public void testParse() throws Exception {
@@ -77,6 +79,15 @@ public final class TestReadOnlySharedStringsTable extends TestCase {
         assertEquals(0, sst.getCount());
         assertEquals(0, sst.getUniqueCount());
         assertNull(sst.getItems()); // same state it's left in if fed a package which has no SST part.
+    }
+
+    public void testXLSBSST() throws Exception {
+        OPCPackage pkg = OPCPackage.open(_ssTests.openResourceAsStream("testEXCEL_textbox.xlsb"));
+        List<PackagePart> parts = pkg.getPartsByName(Pattern.compile("/xl/sharedStrings.bin"));
+        assertEquals(1, parts.size());
+
+        ReadOnlySharedStringsTable rtbl = new ReadOnlySharedStringsTable(parts.get(0));
+
     }
     
 }
