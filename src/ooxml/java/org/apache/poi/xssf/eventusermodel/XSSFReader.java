@@ -67,7 +67,7 @@ public class XSSFReader {
     private static final POILogger LOGGER = POILogFactory.getLogger(XSSFReader.class);
 
     private OPCPackage pkg;
-    private PackagePart workbookPart;
+    protected PackagePart workbookPart;
 
     /**
      * Creates a new XSSFReader, for the given package
@@ -195,26 +195,26 @@ public class XSSFReader {
         /**
          *  Maps relId and the corresponding PackagePart
          */
-        private final Map<String, PackagePart> sheetMap;
+        final Map<String, PackagePart> sheetMap;
 
         /**
          * Current CTSheet bean
          */
-        private XSSFSheetRef xssfSheetRef;
+        XSSFSheetRef xssfSheetRef;
         
         /**
          * Iterator over CTSheet objects, returns sheets in <tt>logical</tt> order.
          * We can't rely on the Ooxml4J's relationship iterator because it returns objects in physical order,
          * i.e. as they are stored in the underlying package
          */
-        private final Iterator<XSSFSheetRef> sheetIterator;
+        final Iterator<XSSFSheetRef> sheetIterator;
 
         /**
          * Construct a new SheetIterator
          *
          * @param wb package part holding workbook.xml
          */
-        private SheetIterator(PackagePart wb) throws IOException {
+        SheetIterator(PackagePart wb) throws IOException {
 
             /**
              * The order of sheets is defined by the order of CTSheet elements in workbook.xml
@@ -234,31 +234,39 @@ public class XSSFReader {
                 }
                 //step 2. Read array of CTSheet elements, wrap it in a LinkedList
                 //and construct an iterator
-
-                XMLSheetRefReader xmlSheetRefReader = new XMLSheetRefReader();
-                XMLReader xmlReader = null;
-                try {
-                    xmlReader = SAXHelper.newXMLReader();
-                } catch (ParserConfigurationException e) {
-                    throw new POIXMLException(e);
-                }
-                xmlReader.setContentHandler(xmlSheetRefReader);
-                xmlReader.parse(new InputSource(wb.getInputStream()));
-
-                List<XSSFSheetRef> validSheets = new ArrayList<XSSFSheetRef>();
-                for (XSSFSheetRef xssfSheetRef : xmlSheetRefReader.getSheetRefs()) {
-                    //if there's no relationship id, silently skip the sheet
-                    String sheetId = xssfSheetRef.getId();
-                    if (sheetId != null && sheetId.length() > 0) {
-                        validSheets.add(xssfSheetRef);
-                    }
-                }
-                sheetIterator = validSheets.iterator();
+                sheetIterator = createSheetIteratorFromWB(wb);
             } catch (InvalidFormatException e){
+                throw new POIXMLException(e);
+            }
+        }
+
+        Iterator<XSSFSheetRef> createSheetIteratorFromWB(PackagePart wb) throws IOException {
+
+            XMLSheetRefReader xmlSheetRefReader = new XMLSheetRefReader();
+            XMLReader xmlReader = null;
+            try {
+                xmlReader = SAXHelper.newXMLReader();
+            } catch (ParserConfigurationException e) {
                 throw new POIXMLException(e);
             } catch (SAXException e) {
                 throw new POIXMLException(e);
             }
+            xmlReader.setContentHandler(xmlSheetRefReader);
+            try {
+                xmlReader.parse(new InputSource(wb.getInputStream()));
+            } catch (SAXException e) {
+                throw new POIXMLException(e);
+            }
+
+            List<XSSFSheetRef> validSheets = new ArrayList<XSSFSheetRef>();
+            for (XSSFSheetRef xssfSheetRef : xmlSheetRefReader.getSheetRefs()) {
+                //if there's no relationship id, silently skip the sheet
+                String sheetId = xssfSheetRef.getId();
+                if (sheetId != null && sheetId.length() > 0) {
+                    validSheets.add(xssfSheetRef);
+                }
+            }
+            return validSheets.iterator();
         }
 
         /**
@@ -371,7 +379,7 @@ public class XSSFReader {
         }
     }
 
-    private final static class XSSFSheetRef {
+    protected final static class XSSFSheetRef {
         //do we need to store sheetId, too?
         private final String id;
         private final String name;

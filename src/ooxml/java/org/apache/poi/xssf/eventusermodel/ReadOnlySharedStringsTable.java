@@ -134,9 +134,6 @@ public class ReadOnlySharedStringsTable extends DefaultHandler {
         int firstByte = pis.read();
         if (firstByte > -1) {
             pis.unread(firstByte);
-            if (firstByte == 0x9f) {
-                readFromBinary(is);
-            } else {
                 InputSource sheetSource = new InputSource(pis);
                 try {
                     XMLReader sheetParser = SAXHelper.newXMLReader();
@@ -146,12 +143,9 @@ public class ReadOnlySharedStringsTable extends DefaultHandler {
                     throw new RuntimeException("SAX parser appears to be broken - " + e.getMessage());
                 }
             }
-        }
-    }
-
-    private void readFromBinary(InputStream is) {
 
     }
+
 
     /**
      * Return an integer representing the total count of strings in the workbook. This count does not

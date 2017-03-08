@@ -14,7 +14,7 @@ untitled1.jpx
 log*.*
 dist
 *.log
-bin
+src/ooxml/java/org/apache/poi/xssf/bin
 .ant-targets-build.xml
 out
 .idea

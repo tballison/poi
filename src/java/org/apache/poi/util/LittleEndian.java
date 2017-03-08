@@ -165,6 +165,14 @@ public class LittleEndian implements LittleEndianConsts
         return ( b3 << 24 ) + ( b2 << 16 ) + ( b1 << 8 ) + ( b0 << 0 );
     }
 
+    public static int get24BitInt( byte[] data, int offset) {
+        int i = offset;
+        int b0 = data[i++] & 0xFF;
+        int b1 = data[i++] & 0xFF;
+        int b2 = data[i++] & 0xFF;
+        return ( b2 << 16 ) + ( b1 << 8 ) + ( b0 << 0 );
+    }
+
     /**
      * get a long value from a byte array
      * 

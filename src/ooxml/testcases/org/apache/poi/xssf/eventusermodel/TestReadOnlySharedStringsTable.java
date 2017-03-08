@@ -80,14 +80,5 @@ public final class TestReadOnlySharedStringsTable extends TestCase {
         assertEquals(0, sst.getUniqueCount());
         assertNull(sst.getItems()); // same state it's left in if fed a package which has no SST part.
     }
-
-    public void testXLSBSST() throws Exception {
-        OPCPackage pkg = OPCPackage.open(_ssTests.openResourceAsStream("testEXCEL_textbox.xlsb"));
-        List<PackagePart> parts = pkg.getPartsByName(Pattern.compile("/xl/sharedStrings.bin"));
-        assertEquals(1, parts.size());
-
-        ReadOnlySharedStringsTable rtbl = new ReadOnlySharedStringsTable(parts.get(0));
-
-    }
     
 }
