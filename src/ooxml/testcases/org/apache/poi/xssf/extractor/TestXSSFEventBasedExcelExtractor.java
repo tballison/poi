@@ -47,7 +47,7 @@ public class TestXSSFEventBasedExcelExtractor {
 	@Test
 	public void testGetSimpleText() throws Exception {
 		// a very simple file
-	   XSSFEventBasedExcelExtractor extractor = getExtractor("comments2.xlsx");
+	   XSSFEventBasedExcelExtractor extractor = getExtractor("sample.xlsx");
 	   extractor.setIncludeCellComments(true);
 		extractor.getText();
 		
