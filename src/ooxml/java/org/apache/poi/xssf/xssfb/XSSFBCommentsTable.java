@@ -1,4 +1,4 @@
-package org.apache.poi.xssf.eventusermodel;
+package org.apache.poi.xssf.xssfb;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,13 +10,10 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import org.apache.poi.ooxmlb.BinaryReader;
+import org.apache.poi.ooxmlb.POIXMLBException;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.util.LittleEndian;
-import org.apache.poi.xssf.binary.BinaryParseException;
-import org.apache.poi.xssf.binary.RichStr;
-import org.apache.poi.xssf.binary.XSSFBComment;
-import org.apache.poi.xssf.binary.XSSFBUtils;
-import org.apache.poi.xssf.binary.XSSFBinaryRecordType;
 
 public class XSSFBCommentsTable extends BinaryReader {
 
@@ -38,9 +35,8 @@ public class XSSFBCommentsTable extends BinaryReader {
     }
 
     @Override
-    public void handleRecord(int id, byte[] data) throws BinaryParseException {
-        XSSFBinaryRecordType recordType = XSSFBinaryRecordType.lookup(id);
-        System.out.println("COMMENTS TABLE: " + id + " : " + recordType + " : " + data.length);
+    public void handleRecord(int id, byte[] data) throws POIXMLBException {
+        XSSFBRecordType recordType = XSSFBRecordType.lookup(id);
         switch (recordType) {
             case BrtBeginComment:
                 int offset = 0;
@@ -50,7 +46,7 @@ public class XSSFBCommentsTable extends BinaryReader {
                 int colFirst = XSSFBUtils.castToInt(LittleEndian.getUInt(data, offset)); offset += LittleEndian.INT_SIZE;
                 int colLast = XSSFBUtils.castToInt(LittleEndian.getUInt(data, offset));
                 //for strict parsing; confirm that rowFirst==rowLast and colFirst==colLats (2.4.28)
-                cellAddress = new CellAddress(colFirst, rowFirst);
+                cellAddress = new CellAddress(rowFirst, colFirst);
                 break;
             case BrtCommentText:
                 RichStr richStr = RichStr.build(data, 0);

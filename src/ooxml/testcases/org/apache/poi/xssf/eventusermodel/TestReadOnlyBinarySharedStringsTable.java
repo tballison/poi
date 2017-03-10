@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import org.apache.poi.POIDataSamples;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
+import org.apache.poi.xssf.xssfb.ReadOnlyBinarySharedStringsTable;
 import org.junit.Test;
 
 public class TestReadOnlyBinarySharedStringsTable {

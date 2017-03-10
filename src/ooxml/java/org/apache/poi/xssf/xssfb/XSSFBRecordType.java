@@ -1,6 +1,6 @@
-package org.apache.poi.xssf.binary;
+package org.apache.poi.xssf.xssfb;
 
-public enum XSSFBinaryRecordType {
+public enum XSSFBRecordType {
 
     BrtCellBlank(1),
     BrtCellRk(2),
@@ -12,7 +12,7 @@ public enum XSSFBinaryRecordType {
     BrtFmlaString(8),
     BrtFmlaNum(9),
     BrtFmlaBool(10),
-    BrtFmlError(11),
+    BrtFmlaError(11),
     BrtRowHdr(0),
     BrtCellRString(62),
     BrtBeginSheet(129),
@@ -21,6 +21,7 @@ public enum XSSFBinaryRecordType {
     BrtColInfo(60),
     BrtBeginSheetData(145),
     BrtEndSheetData(146),
+    BrtBeginHeaderFooter(479),
 
     //comments
     BrtBeginCommentAuthors(630),
@@ -40,17 +41,17 @@ public enum XSSFBinaryRecordType {
     BrtEndCellStyleXFS(627),
 
     //stored strings table
-    BRtSstItem(19),   //stored strings items
-    BRtBeginSst(159), //stored strings begin sst
-    BRtEndSst(160),   //stored strings end sst
+    BrtSstItem(19),   //stored strings items
+    BrtBeginSst(159), //stored strings begin sst
+    BrtEndSst(160),   //stored strings end sst
 
-    BRtBundleSh(156), //defines worksheet in wb part
+    BrtBundleSh(156), //defines worksheet in wb part
     Unimplemented(-1);
     ;
 
     private final int id;
 
-    XSSFBinaryRecordType(int id) {
+    XSSFBRecordType(int id) {
         this.id = id;
     }
 
@@ -58,8 +59,8 @@ public enum XSSFBinaryRecordType {
         return id;
     }
 
-    public static XSSFBinaryRecordType lookup(int id) {
-        for (XSSFBinaryRecordType r : XSSFBinaryRecordType.values()) {
+    public static XSSFBRecordType lookup(int id) {
+        for (XSSFBRecordType r : XSSFBRecordType.values()) {
             if (r.id == id) {
                 return r;
             }

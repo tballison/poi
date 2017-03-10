@@ -1,4 +1,4 @@
-package org.apache.poi.xssf.binary;
+package org.apache.poi.xssf.xssfb;
 
 
 import org.apache.poi.ss.usermodel.ClientAnchor;

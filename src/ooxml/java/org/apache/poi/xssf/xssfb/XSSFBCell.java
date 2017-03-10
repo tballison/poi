@@ -1,9 +1,9 @@
-package org.apache.poi.xssf.binary;
+package org.apache.poi.xssf.xssfb;
 
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.util.LittleEndian;
 
-public class XSSFBinaryCell {
+public class XSSFBCell {
     public static int length = 8;
 
     /**
@@ -13,7 +13,7 @@ public class XSSFBinaryCell {
      * @param currentRow 0-offset based current row count
      * @param cell
      */
-    public static void parse(byte[] data, int offset,  int currentRow, XSSFBinaryCell cell) {
+    public static void parse(byte[] data, int offset,  int currentRow, XSSFBCell cell) {
         long colNum = LittleEndian.getUInt(data, offset); offset += LittleEndian.INT_SIZE;
         int styleIdx = LittleEndian.get24BitInt(data, offset); offset += 3;
         //TODO: range checking

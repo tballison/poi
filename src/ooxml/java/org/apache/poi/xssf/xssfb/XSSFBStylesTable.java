@@ -1,4 +1,4 @@
-package org.apache.poi.xssf.eventusermodel;
+package org.apache.poi.xssf.xssfb;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,10 +8,9 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.poi.POIXMLException;
+import org.apache.poi.ooxmlb.BinaryReader;
+import org.apache.poi.ooxmlb.POIXMLBException;
 import org.apache.poi.ss.usermodel.BuiltinFormats;
-import org.apache.poi.xssf.binary.BinaryParseException;
-import org.apache.poi.xssf.binary.XSSFBUtils;
-import org.apache.poi.xssf.binary.XSSFBinaryRecordType;
 
 public class XSSFBStylesTable extends BinaryReader {
 
@@ -37,8 +36,8 @@ public class XSSFBStylesTable extends BinaryReader {
     }
 
     @Override
-    public void handleRecord(int recordType, byte[] data) throws BinaryParseException {
-        XSSFBinaryRecordType type = XSSFBinaryRecordType.BRtBeginSst.lookup(recordType);
+    public void handleRecord(int recordType, byte[] data) throws POIXMLBException {
+        XSSFBRecordType type = XSSFBRecordType.BrtBeginSst.lookup(recordType);
         switch (type) {
             case BrtBeginCellXFs:
                 inCellXFS = true;

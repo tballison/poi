@@ -1,12 +1,16 @@
-package org.apache.poi.xssf.eventusermodel;
+package org.apache.poi.ooxmlb;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.poi.util.Internal;
 import org.apache.poi.util.LittleEndianInputStream;
-import org.apache.poi.xssf.binary.BinaryParseException;
 
-abstract class BinaryReader {
+/**
+ * Experimental parser for Microsoft's ooxml xssfb format
+ */
+@Internal
+public abstract class BinaryReader {
 
     private final LittleEndianInputStream is;
 
@@ -56,6 +60,6 @@ abstract class BinaryReader {
 
     }
 
-    abstract public void handleRecord(int recordType, byte[] bytes) throws BinaryParseException;
+    abstract public void handleRecord(int recordType, byte[] data) throws POIXMLBException;
 
 }

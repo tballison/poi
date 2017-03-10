@@ -1,10 +1,12 @@
-package org.apache.poi.xssf.binary;
+package org.apache.poi.xssf.xssfb;
 
+
+import org.apache.poi.ooxmlb.POIXMLBException;
 
 public class RichStr {
 
 
-    public static RichStr build(byte[] bytes, int offset) throws BinaryParseException {
+    public static RichStr build(byte[] bytes, int offset) throws POIXMLBException {
         byte first = bytes[offset];
         boolean dwSizeStrRunExists = (first >> 7 & 1) == 1;//first bit == 1?
         boolean phoneticExists = (first >> 6 & 1) == 1;//second bit == 1?

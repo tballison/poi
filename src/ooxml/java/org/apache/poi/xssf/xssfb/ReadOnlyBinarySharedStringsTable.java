@@ -1,4 +1,4 @@
-package org.apache.poi.xssf.eventusermodel;
+package org.apache.poi.xssf.xssfb;
 
 
 import java.io.IOException;
@@ -6,12 +6,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.poi.ooxmlb.BinaryReader;
+import org.apache.poi.ooxmlb.POIXMLBException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.util.LittleEndian;
-import org.apache.poi.xssf.binary.BinaryParseException;
-import org.apache.poi.xssf.binary.RichStr;
-import org.apache.poi.xssf.binary.XSSFBinaryRecordType;
 import org.apache.poi.xssf.usermodel.XSSFRelation;
 import org.xml.sax.SAXException;
 
@@ -103,15 +102,15 @@ public class ReadOnlyBinarySharedStringsTable {
         }
 
         @Override
-        public void handleRecord(int recordType, byte[] data) throws BinaryParseException {
-            XSSFBinaryRecordType type = XSSFBinaryRecordType.BRtBeginSst.lookup(recordType);
+        public void handleRecord(int recordType, byte[] data) throws POIXMLBException {
+            XSSFBRecordType type = XSSFBRecordType.BrtBeginSst.lookup(recordType);
 
             switch (type) {
-                case BRtSstItem :
+                case BrtSstItem:
                     RichStr rstr = RichStr.build(data, 0);
                     strings.add(rstr.getString());
                     break;
-                case BRtBeginSst:
+                case BrtBeginSst:
                     count = (int)LittleEndian.getUInt(data,0);
                     uniqueCount = (int)LittleEndian.getUInt(data, 4);
                     break;

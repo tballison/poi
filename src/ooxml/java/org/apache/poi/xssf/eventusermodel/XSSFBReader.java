@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.poi.ooxmlb.BinaryReader;
+import org.apache.poi.ooxmlb.POIXMLBException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -16,18 +18,19 @@ import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.apache.poi.openxml4j.opc.PackageRelationshipCollection;
 import org.apache.poi.openxml4j.opc.PackagingURIHelper;
 import org.apache.poi.util.LittleEndian;
-import org.apache.poi.xssf.binary.BinaryParseException;
-import org.apache.poi.xssf.binary.XSSFBUtils;
-import org.apache.poi.xssf.binary.XSSFBinaryRecordType;
 import org.apache.poi.xssf.usermodel.XSSFRelation;
+import org.apache.poi.xssf.xssfb.XSSFBCommentsTable;
+import org.apache.poi.xssf.xssfb.XSSFBRecordType;
+import org.apache.poi.xssf.xssfb.XSSFBStylesTable;
+import org.apache.poi.xssf.xssfb.XSSFBUtils;
 
-public class XSSFBinaryReader extends XSSFReader {
+public class XSSFBReader extends XSSFReader {
     /**
      * Creates a new XSSFReader, for the given package
      *
      * @param pkg
      */
-    public XSSFBinaryReader(OPCPackage pkg) throws IOException, OpenXML4JException {
+    public XSSFBReader(OPCPackage pkg) throws IOException, OpenXML4JException {
         super(pkg);
     }
 
@@ -101,8 +104,8 @@ public class XSSFBinaryReader extends XSSFReader {
         }
 
         @Override
-        public void handleRecord(int recordType, byte[] data) throws BinaryParseException {
-            if (recordType == XSSFBinaryRecordType.BRtBundleSh.getId()) {
+        public void handleRecord(int recordType, byte[] data) throws POIXMLBException {
+            if (recordType == XSSFBRecordType.BrtBundleSh.getId()) {
                 addWorksheet(data);
             }
         }
@@ -115,7 +118,7 @@ public class XSSFBinaryReader extends XSSFReader {
             long iTabID = LittleEndian.getUInt(data, offset); offset += LittleEndian.INT_SIZE;
             //according to #2.4.304
             if (iTabID < 1 || iTabID > 0x0000FFFFL) {
-                throw new BinaryParseException("table id out of range: "+iTabID);
+                throw new POIXMLBException("table id out of range: "+iTabID);
             }
             StringBuilder sb = new StringBuilder();
             offset += XSSFBUtils.readXLWideString(data, offset, sb);

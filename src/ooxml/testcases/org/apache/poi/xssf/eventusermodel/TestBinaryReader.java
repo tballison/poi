@@ -7,11 +7,12 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.poi.POIDataSamples;
+import org.apache.poi.ooxmlb.BinaryReader;
+import org.apache.poi.ooxmlb.POIXMLBException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.xssf.binary.BinaryParseException;
-import org.apache.poi.xssf.binary.RichStr;
-import org.apache.poi.xssf.binary.XSSFBinaryRecordType;
+import org.apache.poi.xssf.xssfb.RichStr;
+import org.apache.poi.xssf.xssfb.XSSFBRecordType;
 import org.junit.Test;
 
 /**
@@ -56,8 +57,8 @@ public class TestBinaryReader {
         }
 
         @Override
-        public void handleRecord(int recordType, byte[] bytes) throws BinaryParseException {
-            if (recordType == XSSFBinaryRecordType.BRtSstItem.getId()) {
+        public void handleRecord(int recordType, byte[] bytes) throws POIXMLBException {
+            if (recordType == XSSFBRecordType.BrtSstItem.getId()) {
                 RichStr rstr = RichStr.build(bytes, 0);
             }
 

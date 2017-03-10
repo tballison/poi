@@ -1,4 +1,4 @@
-package org.apache.poi.xssf.eventusermodel;
+package org.apache.poi.xssf.xssfb;
 
 /**
  * Created by TALLISON on 3/9/2017.
