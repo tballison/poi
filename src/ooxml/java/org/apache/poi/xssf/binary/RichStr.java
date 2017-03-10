@@ -10,7 +10,7 @@ public class RichStr {
         boolean phoneticExists = (first >> 6 & 1) == 1;//second bit == 1?
         StringBuilder sb = new StringBuilder();
 
-        int read = XLWideString.read(bytes, offset+1, sb);
+        int read = XSSFBUtils.readXLWideString(bytes, offset+1, sb);
         //TODO: parse phonetic strings.
         return new RichStr(sb.toString(), "");
     }

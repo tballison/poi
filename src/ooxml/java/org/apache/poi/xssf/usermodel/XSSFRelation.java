@@ -131,6 +131,13 @@ public final class XSSFRelation extends POIXMLRelation {
         StylesTable.class
     );
 
+    public static final XSSFRelation STYLES_BINARY = new XSSFRelation(
+            "application/vnd.ms-excel.styles",
+            PackageRelationshipTypes.STYLE_PART,
+            "/xl/styles.bin",
+            null
+    );
+
     public static final XSSFRelation DRAWINGS = new XSSFRelation(
         "application/vnd.openxmlformats-officedocument.drawing+xml",
         "http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing",

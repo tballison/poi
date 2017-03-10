@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import org.apache.poi.POIDataSamples;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.util.SAXHelper;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 import org.junit.Test;
@@ -22,27 +23,37 @@ public class TestXSSFBinaryReader {
 
     @Test
     public void testBasic() throws Exception {
-        OPCPackage pkg = OPCPackage.open(_ssTests.openResourceAsStream("51519.xlsb"));
+//        OPCPackage pkg = OPCPackage.open(_ssTests.openResourceAsStream("testVarious.xlsb"));
+        OPCPackage pkg = OPCPackage.open(_ssTests.openResourceAsStream("comments.xlsb"));
 
         XSSFBinaryReader r = new XSSFBinaryReader(pkg);
 
-        assertNotNull(r.getWorkbookData());
-        assertNotNull(r.getSharedStringsData());
-        assertNotNull(r.getStylesData());
+//        assertNotNull(r.getWorkbookData());
+  //      assertNotNull(r.getSharedStringsData());
+        assertNotNull(r.getXSSFBStylesTable());
         ReadOnlyBinarySharedStringsTable sst = new ReadOnlyBinarySharedStringsTable(pkg);
-        Iterator<InputStream> it = r.getSheetsData();
+        XSSFBStylesTable xssfbStylesTable = r.getXSSFBStylesTable();
+        XSSFBinaryReader.SheetIterator it = (XSSFBinaryReader.SheetIterator)r.getSheetsData();
         while (it.hasNext()) {
             InputStream is = it.next();
-            XSSFSheetBinaryHandler sheetHandler = new XSSFSheetBinaryHandler(is, new DebugSheetHandler(), sst);
+
+            XSSFSheetBinaryHandler sheetHandler = new XSSFSheetBinaryHandler(is,
+                    xssfbStylesTable,
+                    it.getXSSFBSheetComments(),
+                    sst,
+                    new DebugSheetHandler(),
+                    new DataFormatter(),
+                    false);
             sheetHandler.parse();
 
         }
 
     }
 
+
     @Test
     public void testRegular() throws Exception {
-        OPCPackage pkg = OPCPackage.open(_ssTests.openResourceAsStream("51519.xlsx"));
+        OPCPackage pkg = OPCPackage.open(_ssTests.openResourceAsStream("date.xlsx"));
 
         XSSFReader r = new XSSFReader(pkg);
 
@@ -79,7 +90,12 @@ public class TestXSSFBinaryReader {
 
         @Override
         public void cell(String cellReference, String formattedValue, XSSFComment comment) {
-            System.out.println(cellReference + " : " + formattedValue);
+            if (comment == null) {
+                System.out.println(cellReference + " : " + formattedValue);
+            } else {
+                System.out.println(cellReference + " : " + formattedValue + " : " + comment.getAuthor() + " : " + comment.getString());
+
+            }
         }
 
         @Override

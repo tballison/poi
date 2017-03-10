@@ -41,14 +41,11 @@ abstract class BinaryReader {
         long recordLength = 0;
         int i = 0;
         boolean halt = false;
-        int multiplier = 1;
         while (i < 4 && ! halt) {
             byte b = is.readByte();
             halt = (b >> 7 & 1) == 0; //if highest bit !=1 then continue
             b &= ~(1<<7);
-            int lenToAdd = multiplier *(int)b;
-            recordLength += lenToAdd;
-            multiplier *= 128;
+            recordLength += (int)b << (i*7); //multiply by 128^i
             i++;
 
         }

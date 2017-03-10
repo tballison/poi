@@ -21,7 +21,26 @@ public enum XSSFBinaryRecordType {
     BrtColInfo(60),
     BrtBeginSheetData(145),
     BrtEndSheetData(146),
-    BRtSstItem(19),   //stored strings item
+
+    //comments
+    BrtBeginCommentAuthors(630),
+    BrtEndCommentAuthors(631),
+    BrtCommentAuthor(632),
+    BrtBeginComment(635),
+    BrtCommentText(637),
+    BrtEndComment(636),
+    //styles table
+    BrtXf(47),
+    BrtFmt(44),
+    BrtBeginFmts(615),
+    BrtEndFmts(616),
+    BrtBeginCellXFs(617),
+    BrtEndCellXFs(618),
+    BrtBeginCellStyleXFS(626),
+    BrtEndCellStyleXFS(627),
+
+    //stored strings table
+    BRtSstItem(19),   //stored strings items
     BRtBeginSst(159), //stored strings begin sst
     BRtEndSst(160),   //stored strings end sst
 
@@ -39,7 +58,7 @@ public enum XSSFBinaryRecordType {
         return id;
     }
 
-    public XSSFBinaryRecordType lookup(int id) {
+    public static XSSFBinaryRecordType lookup(int id) {
         for (XSSFBinaryRecordType r : XSSFBinaryRecordType.values()) {
             if (r.id == id) {
                 return r;

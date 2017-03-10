@@ -2,6 +2,7 @@ package org.apache.poi.xssf.eventusermodel;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,10 +11,15 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
+import org.apache.poi.openxml4j.opc.PackagePartName;
+import org.apache.poi.openxml4j.opc.PackageRelationship;
+import org.apache.poi.openxml4j.opc.PackageRelationshipCollection;
+import org.apache.poi.openxml4j.opc.PackagingURIHelper;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.xssf.binary.BinaryParseException;
-import org.apache.poi.xssf.binary.XLWideString;
+import org.apache.poi.xssf.binary.XSSFBUtils;
 import org.apache.poi.xssf.binary.XSSFBinaryRecordType;
+import org.apache.poi.xssf.usermodel.XSSFRelation;
 
 public class XSSFBinaryReader extends XSSFReader {
     /**
@@ -37,6 +43,16 @@ public class XSSFBinaryReader extends XSSFReader {
         return new SheetIterator(workbookPart);
     }
 
+    public XSSFBStylesTable getXSSFBStylesTable() throws IOException {
+        ArrayList<PackagePart> parts = pkg.getPartsByContentType( XSSFRelation.STYLES_BINARY.getContentType());
+        if(parts.size() == 0) return null;
+
+        // Create the Styles Table, and associate the Themes if present
+        return new XSSFBStylesTable(parts.get(0).getInputStream());
+
+    }
+
+
     public static class SheetIterator extends XSSFReader.SheetIterator {
 
         /**
@@ -52,6 +68,27 @@ public class XSSFBinaryReader extends XSSFReader {
             SheetRefLoader sheetRefLoader = new SheetRefLoader(wb.getInputStream());
             sheetRefLoader.parse();
             return sheetRefLoader.getSheets().iterator();
+        }
+
+        public XSSFBCommentsTable getXSSFBSheetComments() {
+            PackagePart sheetPkg = getSheetPart();
+
+            // Do we have a comments relationship? (Only ever one if so)
+            try {
+                PackageRelationshipCollection commentsList =
+                        sheetPkg.getRelationshipsByType(XSSFRelation.SHEET_COMMENTS.getRelation());
+                if (commentsList.size() > 0) {
+                    PackageRelationship comments = commentsList.getRelationship(0);
+                    PackagePartName commentsName = PackagingURIHelper.createPartName(comments.getTargetURI());
+                    PackagePart commentsPart = sheetPkg.getPackage().getPart(commentsName);
+                    return new XSSFBCommentsTable(commentsPart.getInputStream());
+                }
+            } catch (InvalidFormatException e) {
+                return null;
+            } catch (IOException e) {
+                return null;
+            }
+            return null;
         }
 
     }
@@ -81,10 +118,10 @@ public class XSSFBinaryReader extends XSSFReader {
                 throw new BinaryParseException("table id out of range: "+iTabID);
             }
             StringBuilder sb = new StringBuilder();
-            offset += XLWideString.read(data, offset, sb);
+            offset += XSSFBUtils.readXLWideString(data, offset, sb);
             String relId = sb.toString();
             sb.setLength(0);
-            XLWideString.read(data, offset, sb);
+            XSSFBUtils.readXLWideString(data, offset, sb);
             String name = sb.toString();
             if (relId != null && relId.trim().length() > 0) {
                 sheets.add(new XSSFSheetRef(relId, name));

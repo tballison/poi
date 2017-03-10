@@ -66,7 +66,7 @@ public class XSSFReader {
 
     private static final POILogger LOGGER = POILogFactory.getLogger(XSSFReader.class);
 
-    private OPCPackage pkg;
+    protected OPCPackage pkg;
     protected PackagePart workbookPart;
 
     /**

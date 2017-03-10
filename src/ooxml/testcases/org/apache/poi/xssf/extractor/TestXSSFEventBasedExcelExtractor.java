@@ -37,7 +37,7 @@ import org.junit.Test;
 public class TestXSSFEventBasedExcelExtractor {
 
 	static {
-		System.setProperty("POI.testdata.path", "C:/Users/tallison/Idea Projects/poi-trunk/test-data");
+		System.setProperty("POI.testdata.path", "C:/Users/tallison/Idea Projects/poi-github/test-data");
 	}
 
 	protected XSSFEventBasedExcelExtractor getExtractor(String sampleName) throws Exception {
@@ -51,7 +51,8 @@ public class TestXSSFEventBasedExcelExtractor {
 	@Test
 	public void testGetSimpleText() throws Exception {
 		// a very simple file
-	   XSSFEventBasedExcelExtractor extractor = getExtractor("sample.xlsx");
+	   XSSFEventBasedExcelExtractor extractor = getExtractor("comments2.xlsx");
+	   extractor.setIncludeCellComments(true);
 		extractor.getText();
 		
 		String text = extractor.getText();
