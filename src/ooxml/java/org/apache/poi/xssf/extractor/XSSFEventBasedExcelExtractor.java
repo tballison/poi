@@ -16,14 +16,13 @@
 ==================================================================== */
 package org.apache.poi.xssf.extractor;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.poi.POIXMLProperties;
 import org.apache.poi.POIXMLProperties.CoreProperties;
@@ -55,15 +54,15 @@ import org.xml.sax.XMLReader;
  */
 public class XSSFEventBasedExcelExtractor extends POIXMLTextExtractor 
        implements org.apache.poi.ss.extractor.ExcelExtractor {
-    private OPCPackage container;
-    private POIXMLProperties properties;
+    OPCPackage container;
+    POIXMLProperties properties;
 
-    private Locale locale;
-    private boolean includeTextBoxes = true;
-    private boolean includeSheetNames = true;
-    private boolean includeCellComments = false;
-    private boolean includeHeadersFooters = true;
-    private boolean formulasNotResults = false;
+    Locale locale;
+    boolean includeTextBoxes = true;
+    boolean includeSheetNames = true;
+    boolean includeCellComments = false;
+    boolean includeHeadersFooters = true;
+    boolean formulasNotResults = false;
 
     public XSSFEventBasedExcelExtractor(String path) throws XmlException, OpenXML4JException, IOException {
         this(OPCPackage.open(path));
@@ -232,7 +231,7 @@ public class XSSFEventBasedExcelExtractor extends POIXMLTextExtractor
        }
    }
    
-    private void processShapes(List<XSSFShape> shapes, StringBuffer text) {
+    void processShapes(List<XSSFShape> shapes, StringBuffer text) {
         if (shapes == null){
             return;
         }
@@ -341,7 +340,7 @@ public class XSSFEventBasedExcelExtractor extends POIXMLTextExtractor
          * @see XSSFExcelExtractor#getText()
          * @see org.apache.poi.hssf.extractor.ExcelExtractor#_extractHeaderFooter(org.apache.poi.ss.usermodel.HeaderFooter)
          */
-        private void appendHeaderText(StringBuffer buffer) {
+        void appendHeaderText(StringBuffer buffer) {
             appendHeaderFooterText(buffer, "firstHeader");
             appendHeaderFooterText(buffer, "oddHeader");
             appendHeaderFooterText(buffer, "evenHeader");
@@ -353,7 +352,7 @@ public class XSSFEventBasedExcelExtractor extends POIXMLTextExtractor
          * @see XSSFExcelExtractor#getText()
          * @see org.apache.poi.hssf.extractor.ExcelExtractor#_extractHeaderFooter(org.apache.poi.ss.usermodel.HeaderFooter)
          */
-        private void appendFooterText(StringBuffer buffer) {
+        void appendFooterText(StringBuffer buffer) {
             // append the text for each footer type in the same order
             // they are appended in XSSFExcelExtractor
             appendHeaderFooterText(buffer, "firstFooter");
@@ -364,7 +363,7 @@ public class XSSFEventBasedExcelExtractor extends POIXMLTextExtractor
         /**
          * Append the cell contents we have collected.
          */
-        private void appendCellText(StringBuffer buffer) {
+        void appendCellText(StringBuffer buffer) {
             checkMaxTextSize(buffer, output.toString());
             buffer.append(output);
         }
@@ -372,7 +371,7 @@ public class XSSFEventBasedExcelExtractor extends POIXMLTextExtractor
         /**
          * Reset this <code>SheetTextExtractor</code> for the next sheet.
          */
-        private void reset() {
+        void reset() {
             output.setLength(0);
             firstCellOfRow = true;
             if (headerFooterMap != null) {

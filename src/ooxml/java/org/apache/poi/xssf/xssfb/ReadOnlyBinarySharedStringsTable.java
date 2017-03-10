@@ -1,3 +1,19 @@
+/* ====================================================================
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+==================================================================== */
 package org.apache.poi.xssf.xssfb;
 
 
@@ -6,12 +22,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.ooxmlb.BinaryReader;
+import org.apache.poi.ooxmlb.OOXMLBParser;
 import org.apache.poi.ooxmlb.POIXMLBException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.util.LittleEndian;
-import org.apache.poi.xssf.usermodel.XSSFRelation;
 import org.xml.sax.SAXException;
 
 public class ReadOnlyBinarySharedStringsTable {
@@ -42,7 +57,7 @@ public class ReadOnlyBinarySharedStringsTable {
     public ReadOnlyBinarySharedStringsTable(OPCPackage pkg)
             throws IOException, SAXException {
         ArrayList<PackagePart> parts =
-                pkg.getPartsByContentType(XSSFRelation.SHARED_STRINGS_BINARY.getContentType());
+                pkg.getPartsByContentType(XSSFBRelation.SHARED_STRINGS_BINARY.getContentType());
 
         // Some workbooks have no shared strings table.
         if (parts.size() > 0) {
@@ -95,7 +110,7 @@ public class ReadOnlyBinarySharedStringsTable {
         return this.uniqueCount;
     }
 
-    private class SSTBinaryReader extends BinaryReader {
+    private class SSTBinaryReader extends OOXMLBParser {
 
         SSTBinaryReader(InputStream is) {
             super(is);
@@ -107,7 +122,7 @@ public class ReadOnlyBinarySharedStringsTable {
 
             switch (type) {
                 case BrtSstItem:
-                    RichStr rstr = RichStr.build(data, 0);
+                    XSSFBRichStr rstr = XSSFBRichStr.build(data, 0);
                     strings.add(rstr.getString());
                     break;
                 case BrtBeginSst:

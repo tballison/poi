@@ -36,9 +36,7 @@ import org.xml.sax.SAXException;
  * Tests for {@link org.apache.poi.xssf.eventusermodel.XSSFReader}
  */
 public final class TestReadOnlySharedStringsTable extends TestCase {
-    static {
-        System.setProperty("POI.testdata.path", "C:/users/tallison/Idea Projects/poi-trunk/test-data");
-    }
+
     private static POIDataSamples _ssTests = POIDataSamples.getSpreadSheetInstance();
 
     public void testParse() throws Exception {

@@ -21,7 +21,6 @@ import org.apache.poi.UnsupportedFileFormatException;
 /**
  * We don't support .xlsb files, sorry
  */
-@Deprecated()
 public class XLSBUnsupportedException extends UnsupportedFileFormatException {
     private static final long serialVersionUID = 7849681804154571175L;
     public static final String MESSAGE = ".XLSB Binary Workbooks are not supported"; 

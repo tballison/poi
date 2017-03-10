@@ -56,6 +56,7 @@ import org.apache.poi.xdgf.extractor.XDGFVisioExtractor;
 import org.apache.poi.xslf.extractor.XSLFPowerPointExtractor;
 import org.apache.poi.xslf.usermodel.XSLFRelation;
 import org.apache.poi.xslf.usermodel.XSLFSlideShow;
+import org.apache.poi.xssf.extractor.XSSFBEventBasedExcelExtractor;
 import org.apache.poi.xssf.extractor.XSSFEventBasedExcelExtractor;
 import org.apache.poi.xssf.extractor.XSSFExcelExtractor;
 import org.apache.poi.xssf.usermodel.XSSFRelation;
@@ -224,7 +225,14 @@ public class ExtractorFactory {
                     return new XSSFExcelExtractor(pkg);
                 }
             }
-     
+
+            // Try xlsx binary,
+            for (XSSFRelation rel : XSSFBEventBasedExcelExtractor.SUPPORTED_TYPES) {
+                if (rel.getContentType().equals(contentType)) {
+                    return new XSSFBEventBasedExcelExtractor(pkg);
+                }
+            }
+
             // Is it XWPF?
             for (XWPFRelation rel : XWPFWordExtractor.SUPPORTED_TYPES) {
                 if ( rel.getContentType().equals( contentType ) ) {

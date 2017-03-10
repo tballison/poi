@@ -36,10 +36,6 @@ import org.junit.Test;
  */
 public class TestXSSFEventBasedExcelExtractor {
 
-	static {
-		System.setProperty("POI.testdata.path", "C:/Users/tallison/Idea Projects/poi-github/test-data");
-	}
-
 	protected XSSFEventBasedExcelExtractor getExtractor(String sampleName) throws Exception {
         return new XSSFEventBasedExcelExtractor(XSSFTestDataSamples.
                 openSamplePackage(sampleName));

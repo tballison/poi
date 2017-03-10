@@ -1,3 +1,20 @@
+/* ====================================================================
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+==================================================================== */
+
 package org.apache.poi.xssf.xssfb;
 
 import java.io.IOException;
@@ -10,12 +27,12 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
-import org.apache.poi.ooxmlb.BinaryReader;
+import org.apache.poi.ooxmlb.OOXMLBParser;
 import org.apache.poi.ooxmlb.POIXMLBException;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.util.LittleEndian;
 
-public class XSSFBCommentsTable extends BinaryReader {
+public class XSSFBCommentsTable extends OOXMLBParser {
 
     Map<CellAddress, XSSFBComment> comments = new TreeMap<CellAddress, XSSFBComment>(new CellAddressComparator());//String is the cellAddress A1
     Queue<CellAddress> commentAddresses = new LinkedList<CellAddress>();
@@ -49,8 +66,8 @@ public class XSSFBCommentsTable extends BinaryReader {
                 cellAddress = new CellAddress(rowFirst, colFirst);
                 break;
             case BrtCommentText:
-                RichStr richStr = RichStr.build(data, 0);
-                comment = richStr.getString();
+                XSSFBRichStr xssfbRichStr = XSSFBRichStr.build(data, 0);
+                comment = xssfbRichStr.getString();
                 break;
             case BrtEndComment:
                 comments.put(cellAddress, new XSSFBComment(cellAddress, authors.get(authorId), comment));

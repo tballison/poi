@@ -1,3 +1,20 @@
+/* ====================================================================
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+==================================================================== */
+
 package org.apache.poi.xssf.eventusermodel;
 
 import static org.junit.Assert.assertEquals;
@@ -7,21 +24,16 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.poi.POIDataSamples;
-import org.apache.poi.ooxmlb.BinaryReader;
+import org.apache.poi.ooxmlb.OOXMLBParser;
 import org.apache.poi.ooxmlb.POIXMLBException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.xssf.xssfb.RichStr;
+import org.apache.poi.xssf.xssfb.XSSFBRichStr;
 import org.apache.poi.xssf.xssfb.XSSFBRecordType;
 import org.junit.Test;
 
-/**
- * Created by TALLISON on 3/8/2017.
- */
 public class TestBinaryReader {
-    static {
-        System.setProperty("POI.testdata.path", "C:/users/tallison/Idea Projects/poi-github/test-data");
-    }
+
     private static POIDataSamples _ssTests = POIDataSamples.getSpreadSheetInstance();
 
     @Test
@@ -50,7 +62,7 @@ public class TestBinaryReader {
 
         }
     }
-    private static class DebugBinaryReader extends BinaryReader {
+    private static class DebugBinaryReader extends OOXMLBParser {
 
         DebugBinaryReader(InputStream is) {
             super(is);
@@ -59,7 +71,7 @@ public class TestBinaryReader {
         @Override
         public void handleRecord(int recordType, byte[] bytes) throws POIXMLBException {
             if (recordType == XSSFBRecordType.BrtSstItem.getId()) {
-                RichStr rstr = RichStr.build(bytes, 0);
+                XSSFBRichStr rstr = XSSFBRichStr.build(bytes, 0);
             }
 
         }

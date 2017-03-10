@@ -117,25 +117,12 @@ public final class XSSFRelation extends POIXMLRelation {
         SharedStringsTable.class
     );
 
-    public static final XSSFRelation SHARED_STRINGS_BINARY = new XSSFRelation(
-            "application/vnd.ms-excel.sharedStrings",
-            "http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings",
-            "/xl/sharedStrings.bin",
-            SharedStringsTable.class
-    );
 
     public static final XSSFRelation STYLES = new XSSFRelation(
         "application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml",
         PackageRelationshipTypes.STYLE_PART,
         "/xl/styles.xml",
         StylesTable.class
-    );
-
-    public static final XSSFRelation STYLES_BINARY = new XSSFRelation(
-            "application/vnd.ms-excel.styles",
-            PackageRelationshipTypes.STYLE_PART,
-            "/xl/styles.bin",
-            null
     );
 
     public static final XSSFRelation DRAWINGS = new XSSFRelation(
