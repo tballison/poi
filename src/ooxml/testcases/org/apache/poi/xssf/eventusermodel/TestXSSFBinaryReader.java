@@ -23,20 +23,16 @@ import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.poi.POIDataSamples;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.util.SAXHelper;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 import org.apache.poi.xssf.xssfb.ReadOnlyBinarySharedStringsTable;
 import org.apache.poi.xssf.xssfb.XSSFBSheetHandler;
 import org.apache.poi.xssf.xssfb.XSSFBStylesTable;
 import org.junit.Test;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
 
 public class TestXSSFBinaryReader {
 
@@ -140,18 +136,18 @@ public class TestXSSFBinaryReader {
         while (it.hasNext()) {
             InputStream is = it.next();
             String name = it.getSheetName();
-            DebugSheetHandler debugSheetHandler = new DebugSheetHandler();
-            debugSheetHandler.startSheet(name);
+            TestSheetHandler testSheetHandler = new TestSheetHandler();
+            testSheetHandler.startSheet(name);
             XSSFBSheetHandler sheetHandler = new XSSFBSheetHandler(is,
                     xssfbStylesTable,
                     it.getXSSFBSheetComments(),
                     sst,
-                    debugSheetHandler,
+                    testSheetHandler,
                     new DataFormatter(),
                     false);
             sheetHandler.parse();
-            debugSheetHandler.endSheet();
-            sheetTexts.add(debugSheetHandler.toString());
+            testSheetHandler.endSheet();
+            sheetTexts.add(testSheetHandler.toString());
         }
         return sheetTexts;
 
@@ -168,31 +164,15 @@ public class TestXSSFBinaryReader {
 
 
     @Test
-    public void testRegular() throws Exception {
-        OPCPackage pkg = OPCPackage.open(_ssTests.openResourceAsStream("date.xlsx"));
-
-        XSSFReader r = new XSSFReader(pkg);
-
-        assertNotNull(r.getWorkbookData());
-        assertNotNull(r.getSharedStringsData());
-        assertNotNull(r.getStylesData());
-        ReadOnlySharedStringsTable sst = new ReadOnlySharedStringsTable(pkg);
-        Iterator<InputStream> it = r.getSheetsData();
-        while (it.hasNext()) {
-            InputStream is = it.next();
-            XSSFSheetXMLHandler sheetHandler =
-                    new XSSFSheetXMLHandler(null, sst, new DebugSheetHandler(), true);
-            XMLReader sheetParser = SAXHelper.newXMLReader();
-            sheetParser.setContentHandler(sheetHandler);
-            sheetParser.parse(new InputSource(is));
-
-
-        }
+    public void testDate() throws Exception {
+        List<String> sheets = getSheets("date.xlsb");
+        assertEquals(1, sheets.size());
+        assertContains("1/12/13", sheets.get(0));
 
     }
 
 
-    private class DebugSheetHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
+    private class TestSheetHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
         private final StringBuilder sb = new StringBuilder();
 
         public void startSheet(String sheetName) {
