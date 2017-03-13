@@ -34,9 +34,13 @@ import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
 
 /**
- * Need to have this mirror class because of conflicts w/ regular ooxml relations.
+ * Need to have this mirror class of {@link org.apache.poi.xssf.usermodel.XSSFRelation}
+ * because of conflicts w/ regular ooxml relations.
  * In the casses of SharedStrings and Styles, 2 parts would exist,
- * and "Packages shall not contain equivalent part names..."
+ * and &quot;Packages shall not contain equivalent part names...&quot;
+ *
+ * Also, we need to avoid
+ * the possibility of breaking the marshalling process.
  */
 public class XSSFBRelation extends POIXMLRelation {
     private static final POILogger log = POILogFactory.getLogger(XSSFBRelation.class);

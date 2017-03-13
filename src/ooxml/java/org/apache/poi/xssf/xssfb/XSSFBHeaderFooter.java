@@ -17,9 +17,11 @@
 
 package org.apache.poi.xssf.xssfb;
 
+import org.apache.poi.util.Internal;
 import org.apache.poi.xssf.usermodel.helpers.HeaderFooterHelper;
 
-public class XSSFBHeaderFooter {
+@Internal
+class XSSFBHeaderFooter {
     private final String headerFooterTypeLabel;
     private final boolean isHeader;
     private String rawString;

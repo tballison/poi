@@ -16,7 +16,10 @@
 ==================================================================== */
 package org.apache.poi.xssf.xssfb;
 
-public class XSSFBHeaderFooters {
+import org.apache.poi.util.Internal;
+
+@Internal
+class XSSFBHeaderFooters {
 
     public static XSSFBHeaderFooters parse(byte[] data) {
         boolean diffOddEven = false;

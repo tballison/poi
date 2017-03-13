@@ -17,6 +17,9 @@
 
 package org.apache.poi.xssf.xssfb;
 
+import org.apache.poi.util.Internal;
+
+@Internal
 public enum XSSFBRecordType {
 
     BrtCellBlank(1),
@@ -38,6 +41,7 @@ public enum XSSFBRecordType {
     BrtColInfo(60),
     BrtBeginSheetData(145),
     BrtEndSheetData(146),
+    BrtHLink(494),
     BrtBeginHeaderFooter(479),
 
     //comments

@@ -17,12 +17,12 @@
 
 package org.apache.poi.xssf.xssfb;
 
+import org.apache.poi.util.Internal;
 
-import org.apache.poi.ooxmlb.POIXMLBException;
+@Internal
+class XSSFBRichStr {
 
-public class XSSFBRichStr {
-
-    public static XSSFBRichStr build(byte[] bytes, int offset) throws POIXMLBException {
+    public static XSSFBRichStr build(byte[] bytes, int offset) throws XSSFBParseException {
         byte first = bytes[offset];
         boolean dwSizeStrRunExists = (first >> 7 & 1) == 1;//first bit == 1?
         boolean phoneticExists = (first >> 6 & 1) == 1;//second bit == 1?

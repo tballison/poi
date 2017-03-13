@@ -27,20 +27,21 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
-import org.apache.poi.ooxmlb.OOXMLBParser;
-import org.apache.poi.ooxmlb.POIXMLBException;
 import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.util.Internal;
 import org.apache.poi.util.LittleEndian;
 
-public class XSSFBCommentsTable extends OOXMLBParser {
+@Internal
+public class XSSFBCommentsTable extends XSSFBParser {
 
     Map<CellAddress, XSSFBComment> comments = new TreeMap<CellAddress, XSSFBComment>(new CellAddressComparator());//String is the cellAddress A1
     Queue<CellAddress> commentAddresses = new LinkedList<CellAddress>();
     List<String> authors = new ArrayList<String>();
 
-    //these are all used only during the, and they are mutable!
+    //these are all used only during parsing, and they are mutable!
     int authorId = -1;
     CellAddress cellAddress = null;
+    XSSFBCellRange cellRange = null;
     String comment = null;
     StringBuilder authorBuffer = new StringBuilder();
 
@@ -52,18 +53,16 @@ public class XSSFBCommentsTable extends OOXMLBParser {
     }
 
     @Override
-    public void handleRecord(int id, byte[] data) throws POIXMLBException {
+    public void handleRecord(int id, byte[] data) throws XSSFBParseException {
         XSSFBRecordType recordType = XSSFBRecordType.lookup(id);
         switch (recordType) {
             case BrtBeginComment:
                 int offset = 0;
                 authorId = XSSFBUtils.castToInt(LittleEndian.getUInt(data)); offset += LittleEndian.INT_SIZE;
-                int rowFirst = XSSFBUtils.castToInt(LittleEndian.getUInt(data, offset)); offset += LittleEndian.INT_SIZE;
-                int rowLast = XSSFBUtils.castToInt(LittleEndian.getUInt(data, offset)); offset += LittleEndian.INT_SIZE;
-                int colFirst = XSSFBUtils.castToInt(LittleEndian.getUInt(data, offset)); offset += LittleEndian.INT_SIZE;
-                int colLast = XSSFBUtils.castToInt(LittleEndian.getUInt(data, offset));
-                //for strict parsing; confirm that rowFirst==rowLast and colFirst==colLats (2.4.28)
-                cellAddress = new CellAddress(rowFirst, colFirst);
+                cellRange = XSSFBCellRange.parse(data, offset, cellRange);
+                offset+= XSSFBCellRange.length;
+                //for strict parsing; confirm that firstRow==lastRow and firstCol==colLats (2.4.28)
+                cellAddress = new CellAddress(cellRange.firstRow, cellRange.firstCol);
                 break;
             case BrtCommentText:
                 XSSFBRichStr xssfbRichStr = XSSFBRichStr.build(data, 0);

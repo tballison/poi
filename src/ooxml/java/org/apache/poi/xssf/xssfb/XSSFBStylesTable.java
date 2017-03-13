@@ -25,11 +25,11 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.poi.POIXMLException;
-import org.apache.poi.ooxmlb.OOXMLBParser;
-import org.apache.poi.ooxmlb.POIXMLBException;
 import org.apache.poi.ss.usermodel.BuiltinFormats;
+import org.apache.poi.util.Internal;
 
-public class XSSFBStylesTable extends OOXMLBParser {
+@Internal
+public class XSSFBStylesTable extends XSSFBParser {
 
     private final SortedMap<Short, String> numberFormats = new TreeMap<Short,String>();
     private final List<Short> styleIds = new ArrayList<Short>();
@@ -53,7 +53,7 @@ public class XSSFBStylesTable extends OOXMLBParser {
     }
 
     @Override
-    public void handleRecord(int recordType, byte[] data) throws POIXMLBException {
+    public void handleRecord(int recordType, byte[] data) throws XSSFBParseException {
         XSSFBRecordType type = XSSFBRecordType.BrtBeginSst.lookup(recordType);
         switch (type) {
             case BrtBeginCellXFs:

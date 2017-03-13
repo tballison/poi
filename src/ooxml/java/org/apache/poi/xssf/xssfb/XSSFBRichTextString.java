@@ -18,13 +18,15 @@
 package org.apache.poi.xssf.xssfb;
 
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.util.Internal;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 
 /**
  * Wrapper class around String so that we can use it in Comment.
  * Nothing has been implemented yet except for {@link #getString()}.
  */
-public class XSSFBRichTextString extends XSSFRichTextString {
+@Internal
+class XSSFBRichTextString extends XSSFRichTextString {
     private final String string;
 
     public XSSFBRichTextString(String string) {

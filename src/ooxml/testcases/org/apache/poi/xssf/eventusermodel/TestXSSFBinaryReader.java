@@ -29,7 +29,7 @@ import org.apache.poi.POIDataSamples;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.usermodel.XSSFComment;
-import org.apache.poi.xssf.xssfb.ReadOnlyBinarySharedStringsTable;
+import org.apache.poi.xssf.xssfb.XSSFBSharedStringsTable;
 import org.apache.poi.xssf.xssfb.XSSFBSheetHandler;
 import org.apache.poi.xssf.xssfb.XSSFBStylesTable;
 import org.junit.Test;
@@ -129,7 +129,7 @@ public class TestXSSFBinaryReader {
 //        assertNotNull(r.getWorkbookData());
         //      assertNotNull(r.getSharedStringsData());
         assertNotNull(r.getXSSFBStylesTable());
-        ReadOnlyBinarySharedStringsTable sst = new ReadOnlyBinarySharedStringsTable(pkg);
+        XSSFBSharedStringsTable sst = new XSSFBSharedStringsTable(pkg);
         XSSFBStylesTable xssfbStylesTable = r.getXSSFBStylesTable();
         XSSFBReader.SheetIterator it = (XSSFBReader.SheetIterator)r.getSheetsData();
 
@@ -141,8 +141,7 @@ public class TestXSSFBinaryReader {
             XSSFBSheetHandler sheetHandler = new XSSFBSheetHandler(is,
                     xssfbStylesTable,
                     it.getXSSFBSheetComments(),
-                    sst,
-                    testSheetHandler,
+                    sst, testSheetHandler,
                     new DataFormatter(),
                     false);
             sheetHandler.parse();

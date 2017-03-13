@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.poi.ooxmlb.OOXMLBParser;
-import org.apache.poi.ooxmlb.POIXMLBException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -36,11 +34,16 @@ import org.apache.poi.openxml4j.opc.PackagingURIHelper;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.xssf.usermodel.XSSFRelation;
 import org.apache.poi.xssf.xssfb.XSSFBCommentsTable;
+import org.apache.poi.xssf.xssfb.XSSFBParseException;
+import org.apache.poi.xssf.xssfb.XSSFBParser;
 import org.apache.poi.xssf.xssfb.XSSFBRecordType;
 import org.apache.poi.xssf.xssfb.XSSFBRelation;
 import org.apache.poi.xssf.xssfb.XSSFBStylesTable;
 import org.apache.poi.xssf.xssfb.XSSFBUtils;
 
+/**
+ * Reader for xlsb files.
+ */
 public class XSSFBReader extends XSSFReader {
     /**
      * Creates a new XSSFReader, for the given package
@@ -113,7 +116,7 @@ public class XSSFBReader extends XSSFReader {
 
     }
 
-    private static class SheetRefLoader extends OOXMLBParser {
+    private static class SheetRefLoader extends XSSFBParser {
         List<XSSFSheetRef> sheets = new LinkedList<XSSFSheetRef>();
 
         public SheetRefLoader(InputStream is) {
@@ -121,7 +124,7 @@ public class XSSFBReader extends XSSFReader {
         }
 
         @Override
-        public void handleRecord(int recordType, byte[] data) throws POIXMLBException {
+        public void handleRecord(int recordType, byte[] data) throws XSSFBParseException {
             if (recordType == XSSFBRecordType.BrtBundleSh.getId()) {
                 addWorksheet(data);
             }
@@ -135,7 +138,7 @@ public class XSSFBReader extends XSSFReader {
             long iTabID = LittleEndian.getUInt(data, offset); offset += LittleEndian.INT_SIZE;
             //according to #2.4.304
             if (iTabID < 1 || iTabID > 0x0000FFFFL) {
-                throw new POIXMLBException("table id out of range: "+iTabID);
+                throw new XSSFBParseException("table id out of range: "+iTabID);
             }
             StringBuilder sb = new StringBuilder();
             offset += XSSFBUtils.readXLWideString(data, offset, sb);

@@ -21,9 +21,11 @@ package org.apache.poi.xssf.xssfb;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.util.Internal;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
-public class XSSFBComment extends XSSFComment {
+@Internal
+class XSSFBComment extends XSSFComment {
 
     private final CellAddress cellAddress;
     private final String author;

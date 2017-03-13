@@ -21,19 +21,20 @@ package org.apache.poi.xssf.xssfb;
 import java.io.InputStream;
 import java.util.Queue;
 
-import org.apache.poi.ooxmlb.OOXMLBParser;
-import org.apache.poi.ooxmlb.POIXMLBException;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.util.Internal;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
+import org.apache.poi.xssf.usermodel.XSSFComment;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 
-public class XSSFBSheetHandler extends OOXMLBParser {
+@Internal
+public class XSSFBSheetHandler extends XSSFBParser {
 
     private final static int CHECK_ALL_ROWS = -1;
 
-    private final ReadOnlyBinarySharedStringsTable stringsTable;
+    private final XSSFBSharedStringsTable stringsTable;
     private final XSSFSheetXMLHandler.SheetContentsHandler handler;
     private final XSSFBStylesTable styles;
     private final XSSFBCommentsTable comments;
@@ -44,13 +45,14 @@ public class XSSFBSheetHandler extends OOXMLBParser {
     int lastStartedRow = -1;
     int currentRow = 0;
     byte[] rkBuffer = new byte[8];
+    XSSFBCellRange hyperlinkCellRange = null;
     StringBuilder xlWideStringBuffer = new StringBuilder();
 
-    private final XSSFBCell cellBuffer = new XSSFBCell();
+    private final XSSFBCellHeader cellBuffer = new XSSFBCellHeader();
     public XSSFBSheetHandler(InputStream is,
                              XSSFBStylesTable styles,
                              XSSFBCommentsTable comments,
-                             ReadOnlyBinarySharedStringsTable strings,
+                             XSSFBSharedStringsTable strings,
                              XSSFSheetXMLHandler.SheetContentsHandler sheetContentsHandler,
                              DataFormatter dataFormatter,
                              boolean formulasNotResults) {
@@ -64,14 +66,14 @@ public class XSSFBSheetHandler extends OOXMLBParser {
     }
 
     @Override
-    public void handleRecord(int id, byte[] data) throws POIXMLBException {
+    public void handleRecord(int id, byte[] data) throws XSSFBParseException {
         XSSFBRecordType type = XSSFBRecordType.BrtBeginSst.lookup(id);
 
         switch(type) {
             case BrtRowHdr:
                 long rw = LittleEndian.getUInt(data, 0);
                 if (rw > 0x00100000L) {//could make sure this is larger than currentRow, according to spec?
-                    throw new POIXMLBException("Row number beyond allowable range: "+rw);
+                    throw new XSSFBParseException("Row number beyond allowable range: "+rw);
                 }
                 currentRow = (int)rw;
                 checkMissedComments(currentRow);
@@ -120,7 +122,7 @@ public class XSSFBSheetHandler extends OOXMLBParser {
 
 
     private void beforeCellValue(byte[] data) {
-        XSSFBCell.parse(data, 0, currentRow, cellBuffer);
+        XSSFBCellHeader.parse(data, 0, currentRow, cellBuffer);
         checkMissedComments(currentRow, cellBuffer.getColNum());
     }
 
@@ -136,7 +138,7 @@ public class XSSFBSheetHandler extends OOXMLBParser {
     private void handleFmlaNum(byte[] data) {
         beforeCellValue(data);
         //xNum
-        double val = LittleEndian.getDouble(data, XSSFBCell.length);
+        double val = LittleEndian.getDouble(data, XSSFBCellHeader.length);
         String formatString = styles.getNumberFormatString(cellBuffer.getStyleIdx());
         String formattedVal = dataFormatter.formatRawCellContents(val, cellBuffer.getStyleIdx(), formatString);
         handleCellValue(formattedVal);
@@ -145,14 +147,14 @@ public class XSSFBSheetHandler extends OOXMLBParser {
     private void handleCellSt(byte[] data) {
         beforeCellValue(data);
         xlWideStringBuffer.setLength(0);
-        XSSFBUtils.readXLWideString(data, XSSFBCell.length, xlWideStringBuffer);
+        XSSFBUtils.readXLWideString(data, XSSFBCellHeader.length, xlWideStringBuffer);
         handleCellValue(xlWideStringBuffer.toString());
     }
 
     private void handleFmlaString(byte[] data) {
         beforeCellValue(data);
         xlWideStringBuffer.setLength(0);
-        XSSFBUtils.readXLWideString(data, XSSFBCell.length, xlWideStringBuffer);
+        XSSFBUtils.readXLWideString(data, XSSFBCellHeader.length, xlWideStringBuffer);
         handleCellValue(xlWideStringBuffer.toString());
     }
 
@@ -170,14 +172,14 @@ public class XSSFBSheetHandler extends OOXMLBParser {
 
     private void handleBoolean(byte[] data) {
         beforeCellValue(data);
-        String formattedVal = (data[XSSFBCell.length] == 1) ? "TRUE" : "FALSE";
+        String formattedVal = (data[XSSFBCellHeader.length] == 1) ? "TRUE" : "FALSE";
         handleCellValue(formattedVal);
     }
 
     private void handleCellReal(byte[] data) {
         beforeCellValue(data);
         //xNum
-        double val = LittleEndian.getDouble(data, XSSFBCell.length);
+        double val = LittleEndian.getDouble(data, XSSFBCellHeader.length);
         String formatString = styles.getNumberFormatString(cellBuffer.getStyleIdx());
         String formattedVal = dataFormatter.formatRawCellContents(val, cellBuffer.getStyleIdx(), formatString);
         handleCellValue(formattedVal);
@@ -185,7 +187,7 @@ public class XSSFBSheetHandler extends OOXMLBParser {
 
     private void handleCellRk(byte[] data) {
         beforeCellValue(data);
-        double val = rkNumber(data, XSSFBCell.length);
+        double val = rkNumber(data, XSSFBCellHeader.length);
         String formatString = styles.getNumberFormatString(cellBuffer.getStyleIdx());
         String formattedVal = dataFormatter.formatRawCellContents(val, cellBuffer.getStyleIdx(), formatString);
         handleCellValue(formattedVal);
@@ -193,7 +195,7 @@ public class XSSFBSheetHandler extends OOXMLBParser {
 
     private void handleBrtCellIsst(byte[] data) {
         beforeCellValue(data);
-        long idx = LittleEndian.getUInt(data, XSSFBCell.length);
+        long idx = LittleEndian.getUInt(data, XSSFBCellHeader.length);
         //check for out of range, buffer overflow
 
         XSSFRichTextString rtss = new XSSFRichTextString(stringsTable.getEntryAt((int)idx));
@@ -288,8 +290,6 @@ public class XSSFBSheetHandler extends OOXMLBParser {
         handler.cell(cellAddress.formatAsString(), null, comment);
     }
 
-
-
     private double rkNumber(byte[] data, int offset) {
         //see 2.5.122 for this abomination
         byte b0 = data[offset];
@@ -313,5 +313,17 @@ public class XSSFBSheetHandler extends OOXMLBParser {
         }
         d = (numDivBy100) ? d = (d/100) : d;
         return d;
+    }
+
+    /**
+     * You need to implement this to handle the results
+     *  of the sheet parsing.
+     */
+    public interface SheetContentsHandler extends XSSFSheetXMLHandler.SheetContentsHandler {
+        /**
+         * A cell, with the given formatted value (may be null),
+         * a url (may be null), a toolTip (may be null)
+         *  and possibly a comment (may be null), was encountered */
+        public void hyperlinkCell(String cellReference, String formattedValue, String url, String toolTip, XSSFComment comment);
     }
 }

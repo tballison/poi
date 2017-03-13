@@ -98,4 +98,14 @@ public class TestXSSFBEventBasedExcelExtractor {
         }
     }
 
+    @Test
+    public void testBig() throws Exception {
+        //XSSFEventBasedExcelExtractor ooxmlExtractor = new XSSFEventBasedExcelExtractor(XSSFTestDataSamples.
+          //      openSamplePackage("testVarious.xlsx"));
+
+        XSSFEventBasedExcelExtractor ooxmlExtractor = getExtractor("hyperlink.xlsb");
+        String text = ooxmlExtractor.getText();
+        System.out.println(text);
+    }
+
 }

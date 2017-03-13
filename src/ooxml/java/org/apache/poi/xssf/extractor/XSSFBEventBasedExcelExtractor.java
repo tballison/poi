@@ -26,7 +26,8 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.eventusermodel.XSSFBReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.usermodel.XSSFRelation;
-import org.apache.poi.xssf.xssfb.ReadOnlyBinarySharedStringsTable;
+import org.apache.poi.xssf.xssfb.XSSFBHyperlinksTable;
+import org.apache.poi.xssf.xssfb.XSSFBSharedStringsTable;
 import org.apache.poi.xssf.xssfb.XSSFBCommentsTable;
 import org.apache.poi.xssf.xssfb.XSSFBSheetHandler;
 import org.apache.poi.xssf.xssfb.XSSFBStylesTable;
@@ -34,8 +35,8 @@ import org.apache.xmlbeans.XmlException;
 import org.xml.sax.SAXException;
 
 /**
- * Implementation of a text extractor from OOXML Excel
- * files that uses SAX event based parsing.
+ * Implementation of a text extractor or xlsb Excel
+ * files that uses SAX-like binary parsing.
  */
 public class XSSFBEventBasedExcelExtractor extends XSSFEventBasedExcelExtractor
         implements org.apache.poi.ss.extractor.ExcelExtractor {
@@ -44,6 +45,7 @@ public class XSSFBEventBasedExcelExtractor extends XSSFEventBasedExcelExtractor
             XSSFRelation.XLSB_BINARY_WORKBOOK
     };
 
+    private boolean handleHyperlinksInCells = false;
 
     public XSSFBEventBasedExcelExtractor(String path) throws XmlException, OpenXML4JException, IOException {
         super(path);
@@ -65,11 +67,8 @@ public class XSSFBEventBasedExcelExtractor extends XSSFEventBasedExcelExtractor
         extractor.close();
     }
 
-    /**
-     * Should sheet names be included? Default is true
-     */
-    public void setIncludeSheetNames(boolean includeSheetNames) {
-        this.includeSheetNames = includeSheetNames;
+    public void setHandleHyperlinksInCells(boolean handleHyperlinksInCells) {
+        this.handleHyperlinksInCells = handleHyperlinksInCells;
     }
 
     /**
@@ -89,7 +88,7 @@ public class XSSFBEventBasedExcelExtractor extends XSSFEventBasedExcelExtractor
             SheetContentsHandler sheetContentsExtractor,
             XSSFBStylesTable styles,
             XSSFBCommentsTable comments,
-            ReadOnlyBinarySharedStringsTable strings,
+            XSSFBSharedStringsTable strings,
             InputStream sheetInputStream)
             throws IOException, SAXException {
 
@@ -112,19 +111,22 @@ public class XSSFBEventBasedExcelExtractor extends XSSFEventBasedExcelExtractor
      */
     public String getText() {
         try {
-            ReadOnlyBinarySharedStringsTable strings = new ReadOnlyBinarySharedStringsTable(container);
+            XSSFBSharedStringsTable strings = new XSSFBSharedStringsTable(container);
             XSSFBReader xssfbReader = new XSSFBReader(container);
             XSSFBStylesTable styles = xssfbReader.getXSSFBStylesTable();
             XSSFBReader.SheetIterator iter = (XSSFBReader.SheetIterator) xssfbReader.getSheetsData();
 
             StringBuffer text = new StringBuffer();
             SheetTextExtractor sheetExtractor = new SheetTextExtractor();
-
+            XSSFBHyperlinksTable hyperlinksTable = null;
             while (iter.hasNext()) {
                 InputStream stream = iter.next();
                 if (includeSheetNames) {
                     text.append(iter.getSheetName());
                     text.append('\n');
+                }
+                if (handleHyperlinksInCells) {
+                    hyperlinksTable = new XSSFBHyperlinksTable(iter.getSheetPart());
                 }
                 XSSFBCommentsTable comments = includeCellComments ? iter.getXSSFBSheetComments() : null;
                 processSheet(sheetExtractor, styles, comments, strings, stream);
